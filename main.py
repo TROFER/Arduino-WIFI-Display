@@ -19,19 +19,19 @@ class Main(Renderer):
 
         display = Display("Arduino Remote IP", 4300)
 
-        self._template = Image.open(r"./Resource\Template.png")
+        self._template = Image.open(r"./Resource/Template.png")
         self._fonts = {
             "Large": ImageFont.truetype(
-                r"./Resource\Yagora.ttf",
+                r"./Resource/Yagora.ttf",
                 size=20,
             ),
             "Medium": ImageFont.truetype(
-                r"./Resource\Yagora.ttf",
+                r"./Resource/Yagora.ttf",
                 size=18,
             ),
         }
         self._icons = {
-            "temperature": Image.open(r"./Resource\Temperature.png")
+            "temperature": Image.open(r"./Resource/Temperature.png")
         }
 
         self._icons["temperature"].thumbnail(
