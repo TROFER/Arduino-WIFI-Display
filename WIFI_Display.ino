@@ -22,12 +22,14 @@ Arduino_GFX *DSP = new Arduino_ST7735(
 Arduino_GFX *GFX = new Arduino_Canvas(160 /* width */, 80 /* height */, DSP);
 
 // WIFI Initalisation
-const char *SSID = "";
-const char *PASSWORD = "";
+const bool SOFT_AP = true;
+
+const char *SSID = "ESP3266-DSP";
+const char *PASSWORD = "ChickenNugget";
 
 WiFiUDP UDP;
 const unsigned int LOCAL_UDP_PORT = 4300;
-const unsigned int BUFFER_SIZE = 35000;
+const unsigned int BUFFER_SIZE = 10000;
 char buffer[BUFFER_SIZE];
 
 // Misc Globals
@@ -43,20 +45,39 @@ void setup()
     GFX->fillScreen(BLACK);
     GFX->flush();
 
-    // Connect to WIFI
-    Serial.printf("Connecting to %s\n", SSID);
-    WiFi.begin(SSID, PASSWORD);
-
-    while (WiFi.status() != WL_CONNECTED)
+    // WIFI Configuration
+    if (SOFT_AP)
     {
-        delay(500);
-        Serial.println("...");
+        // Create Soft AP
+        bool success = WiFi.softAP(SSID, PASSWORD);
+        if (success)
+        {
+            Serial.printf("AP: %s Established. PW: %s\n", SSID, PASSWORD);
+            Serial.printf("Listening at %s, UDP port %d\n", "192.168.4.1", LOCAL_UDP_PORT);
+        }
+        else
+        {
+            Serial.printf("Error Establishing AP\n");
+            return;
+        }
+    }
+    else
+    {
+        // Connect to Existing Network
+        Serial.printf("Connecting to %s\n", SSID);
+        WiFi.begin(SSID, PASSWORD);
+
+        while (WiFi.status() != WL_CONNECTED)
+        {
+            delay(500);
+            Serial.println("...");
+        }
+        Serial.printf("Sucessfully Connected to %s\n", SSID);
+        Serial.printf("Listening at %s, UDP port %d\n", WiFi.localIP().toString().c_str(), LOCAL_UDP_PORT);
     }
 
-    Serial.printf("Sucessfully Connected to %s\n", SSID);
-
+    // Setup UDP
     UDP.begin(LOCAL_UDP_PORT);
-    Serial.printf("Listening at %s, UDP port %d\n", WiFi.localIP().toString().c_str(), LOCAL_UDP_PORT);
 }
 
 void parse_pixel(string operation)
